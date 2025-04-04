@@ -1,0 +1,18 @@
+package main
+
+import (
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	gormLogger "gorm.io/gorm/logger"
+)
+
+func main() {
+	dsn := "host=localhost user=admin password=password dbname=mydatabase port=5433 sslmode=disable TimeZone=Asia/Shanghai"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: gormLogger.Default.LogMode(gormLogger.Info), // Enable SQL logging
+	})
+	if err != nil {
+		panic(err)
+	}
+    _ = db
+}

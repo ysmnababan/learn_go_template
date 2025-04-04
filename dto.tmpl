@@ -1,0 +1,17 @@
+package example_feat
+
+type UserCreateRequest struct {
+	Name       string `json:"name"`
+	Email      string `json:"email"`
+	Password   string `json:"password"`
+}
+
+type UserResponse struct {
+    Name       string `json:"name"`
+	Email      string `json:"email"`
+}
+
+func (u *UserResponse) MapFromUserModel(user *UserModel){
+    u.Name = user.Name
+    u.Email = user.Email
+}

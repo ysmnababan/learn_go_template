@@ -1,0 +1,55 @@
+myapp/
+│── cmd/                    # Entry points
+│   ├── api/
+│   │   ├── main.go          # Main application entry point
+│── config/                 # Configuration for different environments
+│   ├── config.go           # Loads ENV variables
+│   ├── stringutils.go      
+│   ├── config_models.go
+│── internal/               # Core application logic
+|   ├── abstraction
+|   |   ├── pagination.go 
+|   |   ├── entity.go 
+|   ├── factory/
+|   |   ├── factory.go
+│   ├── app/                # Business logic (Feature-based)
+│   │   ├── user/
+│   │   │   ├── controller.go   # HTTP handlers
+│   │   │   ├── service.go      # Business logic
+│   │   │   ├── repository.go   # Database interactions
+│   │   │   ├── model.go        # Structs for user entity
+│   │   │   ├── dto.go          # Request/Response DTOs
+│   │   │   ├── routes.go       # User-specific routes
+│   │   ├── auth/               # JWT authentication logic
+│   │   │   ├── controller.go  
+│   │   │   ├── service.go     
+│   │   │   ├── model.go      
+│   │   │   ├── routes.go    
+│   │   │   ├── dto.go        
+│   │   ├── other_feature/      # More features can be added here
+│   ├── middleware/            # Custom middlewares
+│   │   ├── auth.go            # JWT authentication middleware
+│   │   ├── middleware.go
+│   ├── server/                # Server setup
+│   │   ├── server_routes.go   # Register routes
+│   ├── pkg/                   # Shared packages
+│   │   ├── redis/             # Redis client
+│   │   ├── logger/            # Logger setup
+│   │   ├── database/          # DB Connection
+|   |   |   ├── database.go
+│   ├── utils/                 # Utility functions
+|   |   ├── response/
+│   │   |   ├── response.go        # Response handling
+│   │   |   ├── errorconstant.go   # Error constants
+|   |   ├── env/
+|   |   |   ├── env.go
+|   |   ├── validator/
+|   |   |   ├── validator.go
+│── docs/                     # Swagger documentation
+│── migrations/               # Database migrations
+│── test/                     # Unit and integration tests
+│── .gitignore                # Git ignore file
+│── Dockerfile                # Docker containerization
+│── go.mod                    # Go module dependencies
+│── go.sum                    # Dependency checksums
+│── README.md                 # Documentation

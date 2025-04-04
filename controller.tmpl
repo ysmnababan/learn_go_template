@@ -1,0 +1,70 @@
+package example_feat
+import (
+    "{{ .ProjectName }}/internals/factory"
+    "{{ .ProjectName }}/internals/utils/response"
+
+    "github.com/labstack/echo/v4"
+)
+type IUserService interface {
+    Get(ctx echo.Context) (out []*UserResponse, err error)
+    Create(ctx echo.Context, in *UserCreateRequest) (err error)
+}
+
+type handler struct {
+    service IUserService
+}
+
+func NewHandler(f *factory.Factory) *handler{
+    return &handler{
+        service: NewService(f),
+    }
+}
+
+{{ if .Swagger}}
+// @Summary Get List of User
+// @Description Get list of User
+// @Tags user
+// @Produce json
+// @Success 200 {object} response.Success{data=[]UserResponse}
+// @Failure 400 {object} response.errorResponse
+// @Failure 404 {object} response.errorResponse
+// @Failure 500 {object} response.errorResponse
+// @Router /api/v1/users [get] {{ end }}
+func (h *handler) GetUsers(c echo.Context) error {
+    res, err:= h.service.Get(c)
+    if err != nil {
+        return response.ErrorResponse(err).Send(c)
+    }
+    return response.SuccessResponse(res).Send(c)
+}
+
+
+// @Summary Create User
+// @Description Create new User
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param payload body UserCreateRequest true "Payload"
+// @Success 200 {object} response.Success{data=string}
+// @Failure 400 {object} response.errorResponse
+// @Failure 404 {object} response.errorResponse
+// @Failure 500 {object} response.errorResponse
+// @Router /api/v1/users [post]
+func (h *handler) CreateUser(c echo.Context) error {
+    req := &UserCreateRequest{}
+    err:= c.Bind(req)
+    if err!=nil {
+        return response.ErrorWrap(response.ErrUnprocessableEntity, err).Send(c)
+    }
+    {{if .Validator }}
+    err = c.Validate(req)
+    if err!= nil {
+        return response.ErrorWrap(response.ErrValidation, err).Send(c)
+    }{{ end }}
+    err = h.service.Create(c, req)
+    if err != nil {
+        return response.ErrorResponse(err).Send(c)
+    }
+
+    return response.SuccessResponse("mantap").Send(c)
+}
