@@ -22,7 +22,6 @@ type Node struct {
 	Extension string
 	Folders   []*Node
 	File      []*Node
-
 }
 
 type BasicConfig struct {
@@ -66,7 +65,7 @@ var templateRegistry = map[string]string{
 	"entity.go":           "entity.tmpl",
 	"validator.go":        "validator.tmpl",
 	"custom_validator.go": "custom_validator.tmpl",
-	"jwt.go": "token.tmpl",
+	"jwt.go":              "token.tmpl",
 }
 
 func (n *Node) GetFileWithExtension() string {
@@ -93,7 +92,8 @@ func (n *Node) CreateFile(root string, config *BasicConfig) {
 		return
 	}
 
-	tmpl := template.Must(template.New(tmplFilename).ParseFiles(tmplFilename))
+	tmplPath := filepath.Join("templates", tmplFilename) // Assuming templates are in a "templates" directory
+	tmpl := template.Must(template.New(tmplFilename).ParseFiles(tmplPath))
 	filename := filepath.Join(root, n.GetFileWithExtension())
 	file, err := os.Create(filename)
 	if err != nil {
@@ -224,7 +224,7 @@ func testCreateFolder() {
 								Name: "token",
 								File: []*Node{
 									{
-										Name: "jwt",
+										Name:      "jwt",
 										Extension: "go",
 									},
 								},
