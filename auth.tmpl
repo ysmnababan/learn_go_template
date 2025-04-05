@@ -43,15 +43,26 @@ func Authentication(next echo.HandlerFunc) echo.HandlerFunc {
 			return res.ErrorWrap(res.ErrUnauthorized, err).Send(c)
 		}
 
-		var some_uuid string
-		destructName := token.Claims.(jwt.MapClaims)["some_uuid"]
+		var user_id string
+		destructName := token.Claims.(jwt.MapClaims)["user_id"]
 		if destructName != nil {
-			some_uuid = destructName.(string)
+			user_id = destructName.(string)
 		} else {
-			some_uuid = ""
+			user_id = ""
 		}
 
-		c.Set("some_uuid",some_uuid)
+		c.Set("user_id", user_id)
+
+		var email string
+		destructName = token.Claims.(jwt.MapClaims)["email"]
+		if destructName != nil {
+			email = destructName.(string)
+		} else {
+			email = ""
+		}
+
+		c.Set("user_id", user_id)
+		c.Set("email", email)
 		return next(c)
 	}
 }

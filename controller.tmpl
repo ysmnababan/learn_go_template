@@ -2,22 +2,24 @@ package example_feat
 import (
     "{{ .ProjectName }}/internals/factory"
     "{{ .ProjectName }}/internals/utils/response"
+	"fmt"
 
     "github.com/labstack/echo/v4"
 )
 type IUserService interface {
-    Get(ctx echo.Context) (out []*UserResponse, err error)
-    Create(ctx echo.Context, in *UserCreateRequest) (err error)
+	Get(ctx echo.Context) (out []*UserResponse, err error)
+	Create(ctx echo.Context, in *UserCreateRequest) (err error)
+	Login(ctx echo.Context, req *UserLoginRequest) (out *UserLoginResponse, err error)
 }
 
 type handler struct {
-    service IUserService
+	service IUserService
 }
 
-func NewHandler(f *factory.Factory) *handler{
-    return &handler{
-        service: NewService(f),
-    }
+func NewHandler(f *factory.Factory) *handler {
+	return &handler{
+		service: NewService(f),
+	}
 }
 
 {{ if .Swagger}}
@@ -29,16 +31,18 @@ func NewHandler(f *factory.Factory) *handler{
 // @Failure 400 {object} response.errorResponse
 // @Failure 404 {object} response.errorResponse
 // @Failure 500 {object} response.errorResponse
+// @Param Authorization header string true "Bearer Token"
 // @Router /api/v1/users [get] {{ end }}
 func (h *handler) GetUsers(c echo.Context) error {
-    res, err:= h.service.Get(c)
-    if err != nil {
-        return response.ErrorResponse(err).Send(c)
-    }
-    return response.SuccessResponse(res).Send(c)
+	fmt.Println(c.Get("user_id"))
+	res, err := h.service.Get(c)
+	if err != nil {
+		return response.ErrorResponse(err).Send(c)
+	}
+	return response.SuccessResponse(res).Send(c)
 }
 
-
+{{ if .Swagger}}
 // @Summary Create User
 // @Description Create new User
 // @Tags user
@@ -49,22 +53,54 @@ func (h *handler) GetUsers(c echo.Context) error {
 // @Failure 400 {object} response.errorResponse
 // @Failure 404 {object} response.errorResponse
 // @Failure 500 {object} response.errorResponse
-// @Router /api/v1/users [post]
+// @Router /api/v1/users [post] {{ end }}
 func (h *handler) CreateUser(c echo.Context) error {
-    req := &UserCreateRequest{}
-    err:= c.Bind(req)
-    if err!=nil {
-        return response.ErrorWrap(response.ErrUnprocessableEntity, err).Send(c)
-    }
-    {{if .Validator }}
-    err = c.Validate(req)
-    if err!= nil {
-        return response.ErrorWrap(response.ErrValidation, err).Send(c)
-    }{{ end }}
-    err = h.service.Create(c, req)
-    if err != nil {
-        return response.ErrorResponse(err).Send(c)
-    }
+	req := &UserCreateRequest{}
+	err := c.Bind(req)
+	if err != nil {
+		return response.ErrorWrap(response.ErrUnprocessableEntity, err).Send(c)
+	}
 
-    return response.SuccessResponse("mantap").Send(c)
+	err = c.Validate(req)
+	if err != nil {
+		return response.ErrorWrap(response.ErrValidation, err).Send(c)
+	}
+	err = h.service.Create(c, req)
+	if err != nil {
+		return response.ErrorResponse(err).Send(c)
+	}
+
+	return response.SuccessResponse("mantap").Send(c)
+}
+
+{{ if .Swagger}}
+// @Summary Login
+// @Description User Login
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param payload body UserLoginRequest true "Payload"
+// @Success 200 {object} response.Success{data=UserLoginResponse}
+// @Failure 400 {object} response.errorResponse
+// @Failure 404 {object} response.errorResponse
+// @Failure 500 {object} response.errorResponse
+// @Router /api/v1/users/auth [post] {{ end }}
+func (h *handler) Login(c echo.Context) error {
+	req := &UserLoginRequest{}
+	err := c.Bind(req)
+	if err != nil {
+		return response.ErrorWrap(response.ErrUnprocessableEntity, err).Send(c)
+	}
+
+	err = c.Validate(req)
+	if err != nil {
+		return response.ErrorWrap(response.ErrValidation, err).Send(c)
+	}
+
+	res, err := h.service.Login(c, req)
+	if err != nil {
+		return response.ErrorResponse(err).Send(c)
+	}
+
+	return response.SuccessResponse(res).Send(c)
 }

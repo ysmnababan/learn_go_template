@@ -17,17 +17,12 @@ type Pet struct {
 	Breed  string
 }
 
-type FileDetail struct {
-	// TemplateName string
-	Purpose uint
-}
-
 type Node struct {
 	Name      string
 	Extension string
 	Folders   []*Node
 	File      []*Node
-	// Detail    *FileDetail
+
 }
 
 type BasicConfig struct {
@@ -71,6 +66,7 @@ var templateRegistry = map[string]string{
 	"entity.go":           "entity.tmpl",
 	"validator.go":        "validator.tmpl",
 	"custom_validator.go": "custom_validator.tmpl",
+	"jwt.go": "token.tmpl",
 }
 
 func (n *Node) GetFileWithExtension() string {
@@ -117,7 +113,7 @@ func (n *Node) CreateNode(root string, config *BasicConfig) {
 		os.MkdirAll(currentPath, os.ModePerm)
 		if len(n.File) > 0 {
 			for _, child := range n.File {
-				child.CreateNode(currentPath, config)
+				child.CreateFile(currentPath, config)
 			}
 		}
 		if len(n.Folders) > 0 {
@@ -220,6 +216,15 @@ func testCreateFolder() {
 									},
 									{
 										Name:      "custom_validator",
+										Extension: "go",
+									},
+								},
+							},
+							{
+								Name: "token",
+								File: []*Node{
+									{
+										Name: "jwt",
 										Extension: "go",
 									},
 								},
