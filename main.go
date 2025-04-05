@@ -35,6 +35,7 @@ type BasicConfig struct {
 	DBSqlServer   bool
 	EchoFrameWork bool
 	GinFrameWork  bool
+	ModInit       bool
 }
 
 var templateRegistry = map[string]string{
@@ -358,12 +359,13 @@ func testCreateFolder() {
 		// Redis:         true,
 		Validator:     true,
 		EchoFrameWork: true,
+		ModInit: true,
 	}
 	node.CreateNode(root, config)
 	if config.Swagger {
 		runSwagInit(projectDir, `.\\docs`)
 	}
-	initProject(projectDir, projectName)
+	initProject(projectDir, projectName, config)
 }
 
 func runSwagInit(projectDir string, outputDir string) {
@@ -431,7 +433,11 @@ func runCommand(dir, name string, args ...string) error {
 	return cmd.Run()
 }
 
-func initProject(projectDir string, moduleName string) {
+func initProject(projectDir string, moduleName string, config *BasicConfig) {
+
+	if config.Swagger {
+		runSwagInit(projectDir, `.\\docs`)
+	}
 	// Ensure the directory exists
 	if _, err := os.Stat(projectDir); os.IsNotExist(err) {
 		fmt.Println("Project directory does not exist:", projectDir)
@@ -445,11 +451,13 @@ func initProject(projectDir string, moduleName string) {
 		return
 	}
 
-	// Run `go mod tidy` in the specified directory
-	fmt.Println("Running go mod tidy in", projectDir)
-	if err := runCommand(projectDir, "go", "mod", "tidy"); err != nil {
-		fmt.Println("Error running go mod tidy:", err)
-		return
+	if config.ModInit {
+		// Run `go mod tidy` in the specified directory
+		fmt.Println("Running go mod tidy in", projectDir)
+		if err := runCommand(projectDir, "go", "mod", "tidy"); err != nil {
+			fmt.Println("Error running go mod tidy:", err)
+			return
+		}
 	}
 
 	// format golang code
