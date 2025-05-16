@@ -135,7 +135,7 @@ func testCreateFolder() {
 		fmt.Println("Error removing directory:", err)
 		return
 	}
-	projectName := "demo"
+	projectName := "demo_railway"
 	os.MkdirAll(root, os.ModePerm)
 	node := Node{
 		Name: projectName,
@@ -352,7 +352,7 @@ func testCreateFolder() {
 	}
 	projectDir := root + `\` + projectName
 	config := &BasicConfig{
-		ProjectName: "demo",
+		ProjectName: projectName,
 		DBPostgres:  true,
 		JWT:         true,
 		Swagger:     true,
